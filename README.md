@@ -61,10 +61,12 @@
 <summary>点击展开预览图</summary>
 
 ### 登录页面
-![登录页面](./screenshots/login.png)
+![登录页面]<img width="2550" height="1292" alt="image" src="https://github.com/user-attachments/assets/0e3faef6-37ff-4a46-b03b-3a4c396eb30b" />
+
 
 ### 账号列表
-![账号列表](./screenshots/account-list.png)
+![账号列表]<img width="2550" height="1292" alt="image" src="https://github.com/user-attachments/assets/6662353d-6f92-4edd-b007-f3aa94b5bf3f" />
+
 
 ### 批量导入
 ![批量导入]<img width="2550" height="1292" alt="image" src="https://github.com/user-attachments/assets/1889262e-5510-4a20-8b8f-faaf3e58d030" />
@@ -257,5 +259,6 @@ python migrate_history.py  # 历史记录表迁移
 <p align="center">
   Made with ❤️ for Google Account Management
 </p>
+
 
 
