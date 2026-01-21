@@ -1,0 +1,13 @@
+# Flask 核心
+Flask==3.0.0
+Flask-SQLAlchemy==3.1.1
+Flask-CORS==4.0.0
+
+# 数据库
+SQLAlchemy==2.0.23
+
+# TOTP 2FA 支持
+pyotp==2.9.0
+
+# 开发工具
+python-dotenv==1.0.0
