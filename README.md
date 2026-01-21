@@ -67,7 +67,9 @@
 ![账号列表](./screenshots/account-list.png)
 
 ### 批量导入
-![批量导入](./screenshots/import.png)
+![批量导入]<img width="2550" height="1292" alt="image" src="https://github.com/user-attachments/assets/1889262e-5510-4a20-8b8f-faaf3e58d030" />
+<img width="2550" height="1292" alt="image" src="https://github.com/user-attachments/assets/5132326f-9019-46fd-9d39-1e784b8b69cb" />
+
 
 ### 修改历史
 ![修改历史](./screenshots/history.png)
@@ -254,3 +256,4 @@ python migrate_history.py  # 历史记录表迁移
 <p align="center">
   Made with ❤️ for Google Account Management
 </p>
+
