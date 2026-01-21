@@ -72,7 +72,8 @@
 
 
 ### 修改历史
-![修改历史](./screenshots/history.png)
+![修改历史]<img width="2550" height="1292" alt="image" src="https://github.com/user-attachments/assets/a0befb6a-269c-4c8c-8320-5a98c4a34c54" />
+
 
 </details>
 
@@ -256,4 +257,5 @@ python migrate_history.py  # 历史记录表迁移
 <p align="center">
   Made with ❤️ for Google Account Management
 </p>
+
 
