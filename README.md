@@ -92,7 +92,7 @@
 
 1. **克隆项目**
 ```bash
-git clone https://github.com/yynxxxxx/google-manager.git
+git clone https://github.com/yynxxxxx/Google_Manager.git
 cd google-manager
 ```
 
@@ -259,6 +259,7 @@ python migrate_history.py  # 历史记录表迁移
 <p align="center">
   Made with ❤️ for Google Account Management
 </p>
+
 
 
 
