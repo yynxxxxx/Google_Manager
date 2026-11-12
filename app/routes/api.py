@@ -246,6 +246,45 @@ def get_account_history(account_id):
         return error_response(f'获取历史记录失败: {str(e)}', 500)
 
 
+@api_bp.route('/accounts/export', methods=['GET'])
+def export_accounts():
+    """
+    导出账号数据
+    格式要求：----连接账号，密码，和2fa，若有辅助邮箱放在最后
+
+    Query Params:
+        status: 出售状态筛选 (all/sold/unsold，默认 all)
+    
+    Returns:
+        文本内容及账号总数
+    """
+    try:
+        sold_status = request.args.get('status', 'all')
+        accounts = AccountService.get_all_accounts()
+        if sold_status in ['sold', 'unsold']:
+            accounts = [acc for acc in accounts if acc.get('soldStatus') == sold_status]
+
+        lines = []
+        for acc in accounts:
+            email = (acc.get('email') or '').strip()
+            pwd = (acc.get('password') or '').strip()
+            secret = (acc.get('secret') or '').replace(' ', '').replace('\t', '').strip()
+            recovery = (acc.get('recovery') or '').strip()
+
+            parts = [email, pwd, secret]
+            clean_rec = recovery.lower()
+            if recovery and clean_rec not in ['无', '-', '--', 'none', 'null']:
+                parts.append(recovery)
+            lines.append('----'.join(parts))
+
+        return success_response(data={
+            'total': len(accounts),
+            'content': '\n'.join(lines)
+        }, message='导出成功')
+    except Exception as e:
+        return error_response(f'导出失败: {str(e)}', 500)
+
+
 @api_bp.route('/auth/login', methods=['POST'])
 def login():
     """

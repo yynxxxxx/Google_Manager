@@ -18,7 +18,7 @@ class AccountHistory(db.Model):
     changed_at = db.Column(db.DateTime, default=datetime.now)  # 修改时间
     
     # 关联账号
-    account = db.relationship('Account', backref=db.backref('history', lazy='dynamic'))
+    account = db.relationship('Account', backref=db.backref('history', lazy='dynamic', cascade='all, delete-orphan'))
     
     def to_dict(self):
         """转换为字典"""
