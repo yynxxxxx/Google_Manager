@@ -176,6 +176,8 @@ const App = () => {
             if (result.success) {
                 setAccounts(accounts.filter(acc => acc.id !== deletingId));
                 showNotification('账号已删除', 'error');
+            } else {
+                showNotification(result.message || '删除失败', 'error');
             }
         } catch (error) {
             console.error('删除失败:', error);
@@ -327,6 +329,7 @@ const App = () => {
                 {view === 'list' ? (
                     <AccountListView
                         accounts={filteredAccounts}
+                        allAccounts={accounts}
                         search={search}
                         setSearch={setSearch}
                         copyToClipboard={copyToClipboard}

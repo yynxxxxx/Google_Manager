@@ -11,18 +11,23 @@ import {
     StickyNote,
     Copy,
     History,
-    Filter
+    Filter,
+    Download,
+    FileDown
 } from 'lucide-react';
 import ActionButton from './ActionButton';
 import Pagination from './Pagination';
 import usePagination from '../hooks/usePagination';
 import HistoryDrawer from './HistoryDrawer';
+import ExportModal from './ExportModal';
+import { formatAccount } from '../utils/exportHelper';
 
 /**
  * 账号列表视图组件
  */
 const AccountListView = ({
     accounts,
+    allAccounts,
     search,
     setSearch,
     copyToClipboard,
@@ -38,6 +43,8 @@ const AccountListView = ({
 }) => {
     // 筛选状态: 'all' | 'sold' | 'unsold'
     const [soldFilter, setSoldFilter] = useState('all');
+    // 全部导出弹窗状态
+    const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
     // 根据筛选过滤账号
     const filteredAccounts = useMemo(() => {
@@ -70,16 +77,10 @@ const AccountListView = ({
         setHistoryDrawer({ isOpen: false, account: null });
     };
 
-    // 复制全部信息
-    const copyAllInfo = (acc) => {
-        // 去除2FA密钥中的空格
-        const cleanSecret = acc.secret ? acc.secret.replace(/\s/g, '') : '';
-        const fullInfo = `邮箱账号：${acc.email}
-密码：${acc.password}
-恢复邮箱：${acc.recovery}
-谷歌验证码获取：https://2fa.run/2fa/${cleanSecret}
-【账号到手后必备工作】：https://qcn4p837qb99.feishu.cn/wiki/S2bFwQ5vBifHgCkrmgrcAUzlnJd?from=from_copylink`;
-        copyToClipboard(fullInfo, '全部信息');
+    // 单个账号导出（格式：账号----密码----2FA----辅助邮箱，若无辅助邮箱则不带）
+    const handleExportSingle = (acc) => {
+        const text = formatAccount(acc);
+        copyToClipboard(text, '账号导出信息');
     };
 
     return (
@@ -104,38 +105,50 @@ const AccountListView = ({
                     </div>
                 </div>
 
-                {/* 筛选按钮 */}
-                <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1">
-                        <Filter size={16} className={darkMode ? 'text-slate-400' : 'text-slate-500'} />
-                        <span className={`text-sm font-medium ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>筛选：</span>
+                {/* 筛选与导出操作栏 */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
+                            <Filter size={16} className={darkMode ? 'text-slate-400' : 'text-slate-500'} />
+                            <span className={`text-sm font-medium ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>筛选：</span>
+                        </div>
+                        <div className={`flex gap-1 p-1 rounded-xl ${darkMode ? 'bg-slate-700/50' : 'bg-slate-100'}`}>
+                            <button
+                                onClick={() => { setSoldFilter('all'); pagination.resetPage(); }}
+                                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${soldFilter === 'all'
+                                    ? (darkMode ? 'bg-slate-600 text-white shadow' : 'bg-white text-slate-800 shadow')
+                                    : (darkMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-500 hover:text-slate-700')}`}
+                            >
+                                全部 ({accounts.length})
+                            </button>
+                            <button
+                                onClick={() => { setSoldFilter('unsold'); pagination.resetPage(); }}
+                                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${soldFilter === 'unsold'
+                                    ? 'bg-green-500 text-white shadow'
+                                    : (darkMode ? 'text-green-400 hover:bg-green-900/30' : 'text-green-600 hover:bg-green-50')}`}
+                            >
+                                未售出 ({accounts.filter(a => a.soldStatus !== 'sold').length})
+                            </button>
+                            <button
+                                onClick={() => { setSoldFilter('sold'); pagination.resetPage(); }}
+                                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${soldFilter === 'sold'
+                                    ? 'bg-red-500 text-white shadow'
+                                    : (darkMode ? 'text-red-400 hover:bg-red-900/30' : 'text-red-600 hover:bg-red-50')}`}
+                            >
+                                已售出 ({accounts.filter(a => a.soldStatus === 'sold').length})
+                            </button>
+                        </div>
                     </div>
-                    <div className={`flex gap-1 p-1 rounded-xl ${darkMode ? 'bg-slate-700/50' : 'bg-slate-100'}`}>
-                        <button
-                            onClick={() => { setSoldFilter('all'); pagination.resetPage(); }}
-                            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${soldFilter === 'all'
-                                ? (darkMode ? 'bg-slate-600 text-white shadow' : 'bg-white text-slate-800 shadow')
-                                : (darkMode ? 'text-slate-400 hover:text-slate-200' : 'text-slate-500 hover:text-slate-700')}`}
-                        >
-                            全部 ({accounts.length})
-                        </button>
-                        <button
-                            onClick={() => { setSoldFilter('unsold'); pagination.resetPage(); }}
-                            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${soldFilter === 'unsold'
-                                ? 'bg-green-500 text-white shadow'
-                                : (darkMode ? 'text-green-400 hover:bg-green-900/30' : 'text-green-600 hover:bg-green-50')}`}
-                        >
-                            未售出 ({accounts.filter(a => a.soldStatus !== 'sold').length})
-                        </button>
-                        <button
-                            onClick={() => { setSoldFilter('sold'); pagination.resetPage(); }}
-                            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${soldFilter === 'sold'
-                                ? 'bg-red-500 text-white shadow'
-                                : (darkMode ? 'text-red-400 hover:bg-red-900/30' : 'text-red-600 hover:bg-red-50')}`}
-                        >
-                            已售出 ({accounts.filter(a => a.soldStatus === 'sold').length})
-                        </button>
-                    </div>
+
+                    {/* 全部账号导出按钮 */}
+                    <button
+                        onClick={() => setIsExportModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-blue-500/20 active:scale-95 cursor-pointer"
+                        title="打开全部账号导出窗口"
+                    >
+                        <FileDown size={15} />
+                        <span>全部账号导出</span>
+                    </button>
                 </div>
 
                 <div className={`rounded-3xl border shadow-sm overflow-hidden transition-colors ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
@@ -266,11 +279,11 @@ const AccountListView = ({
 
                                                 <div className={`h-5 w-[1px] ${darkMode ? 'bg-slate-600' : 'bg-slate-200'}`}></div>
 
-                                                <button onClick={() => copyAllInfo(acc)}
-                                                    className="flex items-center gap-1 px-2 py-1.5 bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-[10px] font-bold rounded-lg hover:from-purple-600 hover:to-indigo-600 transition-all shadow-sm"
-                                                    title="复制全部信息">
-                                                    <Copy size={12} />
-                                                    <span>全部</span>
+                                                <button onClick={() => handleExportSingle(acc)}
+                                                    className="flex items-center gap-1 px-2 py-1.5 bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-[10px] font-bold rounded-lg hover:from-purple-600 hover:to-indigo-600 transition-all shadow-sm active:scale-95"
+                                                    title={`导出账号信息到剪切板\n格式：${formatAccount(acc)}`}>
+                                                    <Download size={12} />
+                                                    <span>导出</span>
                                                 </button>
                                             </div>
                                         </td>
@@ -336,6 +349,15 @@ const AccountListView = ({
                 isOpen={historyDrawer.isOpen}
                 onClose={closeHistoryDrawer}
                 account={historyDrawer.account}
+                darkMode={darkMode}
+            />
+
+            {/* 全部账号导出弹窗 */}
+            <ExportModal
+                isOpen={isExportModalOpen}
+                onClose={() => setIsExportModalOpen(false)}
+                accounts={allAccounts || accounts}
+                copyToClipboard={copyToClipboard}
                 darkMode={darkMode}
             />
         </>

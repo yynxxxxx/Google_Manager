@@ -218,6 +218,9 @@ class AccountService:
         if not account:
             return False
         
+        # 先删除该账号关联的所有修改历史记录，防止外键约束报错
+        AccountHistory.query.filter_by(account_id=account_id).delete()
+        
         db.session.delete(account)
         db.session.commit()
         return True
